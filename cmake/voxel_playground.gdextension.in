@@ -1,0 +1,9 @@
+[configuration]
+
+entry_symbol = "@VOXEL_GDEXTENSION_ENTRY_SYMBOL@"
+compatibility_minimum = "4.6"
+
+[libraries]
+
+@VOXEL_GDEXT_PLATFORM@.debug.@VOXEL_GDEXT_ARCH@ = "@VOXEL_GDEXTENSION_DEBUG_LIBRARY@"
+@VOXEL_GDEXT_PLATFORM@.release.@VOXEL_GDEXT_ARCH@ = "@VOXEL_GDEXTENSION_RELEASE_LIBRARY@"
