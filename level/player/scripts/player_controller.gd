@@ -12,7 +12,7 @@ extends CharacterBody3D
 @onready var eye_camera: Camera3D = $Head/EyeCamera
 
 # 飞行模式状态
-var flying: bool = false
+@export var flying: bool = false
 
 func _ready() -> void:
 	# 锁定并隐藏鼠标

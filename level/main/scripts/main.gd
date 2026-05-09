@@ -1,19 +1,23 @@
 extends Node3D
 
 @export var world_size: Vector3i = Vector3i(16, 16, 16)
-@export_range(-1, 1) var cut_off: float = 0.5
+@export_range(0.0, 1.0) var terrain_density: float = 0.65
+@export_range(0.001, 1.0, 0.001) var noise_frequency: float = 0.08
+@export var noise_seed: int = 1337
 @export var player_scene: PackedScene
 
-@onready var grass_cube: CSGBox3D = $GreenCube
-@onready var white_cube: CSGBox3D = $WhiteCube
+@onready var mulit_mesh_instace: MultiMeshInstance3D = $MultiMeshInstance3D
 
 # 存储所有生成的方块位置
 var generated_blocks: Array[Vector3i] = []
+var generated_block_lookup: Dictionary = {}
 
-func set_block(cube: CSGBox3D, position: Vector3i) -> void:
-	cube.position = Vector3(position)
-	add_child(cube)
-	generated_blocks.append(position)
+func add_block(block_position: Vector3i) -> void:
+	if generated_block_lookup.has(block_position):
+		return
+
+	generated_blocks.append(block_position)
+	generated_block_lookup[block_position] = true
 
 # 使用广度优先搜索找到距离目标位置最近的方块
 func find_nearest_block(start_pos: Vector3i) -> Vector3i:
@@ -39,7 +43,7 @@ func find_nearest_block(start_pos: Vector3i) -> Vector3i:
 		var current: Vector3i = queue.pop_front()
 		
 		# 如果当前位置有方块，返回这个位置（玩家将站在这个方块上方）
-		if generated_blocks.has(current):
+		if generated_block_lookup.has(current):
 			return current
 		
 		# 检查所有邻居
@@ -54,29 +58,42 @@ func find_nearest_block(start_pos: Vector3i) -> Vector3i:
 	# 如果没找到，返回原位置
 	return start_pos
 
-func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+func generate_terrain() -> void:
+	generated_blocks.clear()
+	generated_block_lookup.clear()
 
-	var random_generator = FastNoiseLite.new()
-	
-	var random_number_generater = RandomNumberGenerator.new()
-	random_number_generater.randomize()
+	var noise := FastNoiseLite.new()
+	noise.seed = noise_seed
+	noise.frequency = noise_frequency
+
+	var max_height: int = maxi(1, world_size.y - 1)
+	var filled_height: float = clampf(terrain_density, 0.0, 1.0) * float(max_height)
 
 	for x in range(world_size.x):
-		for y in range(world_size.y):
-			for z in range(world_size.z):
-				var random_value = random_generator.get_noise_3d(x, y, z)
-				var random_number = random_number_generater.randf()
+		for z in range(world_size.z):
+			var noise_sample: float = (noise.get_noise_2d(x, z) + 1.0) * 0.5
+			var column_height: int = clampi(int(round(noise_sample * filled_height)), 0, max_height)
 
-				if random_value > cut_off && random_number > 0.5:
-					set_block(grass_cube.duplicate() as CSGBox3D, Vector3i(x, y, z))
+			for y in range(column_height + 1):
+				add_block(Vector3i(x, y, z))
 
-				elif random_value > cut_off && random_number <= 0.5:
-					set_block(white_cube.duplicate() as CSGBox3D, Vector3i(x, y, z))
+func rebuild_multimesh() -> void:
+	var multimesh: MultiMesh = mulit_mesh_instace.multimesh
+	multimesh.instance_count = generated_blocks.size()
+
+	for i in range(multimesh.instance_count):
+		multimesh.set_instance_transform(i, Transform3D(Basis(), Vector3(generated_blocks[i])))
+
+func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	generate_terrain()
+	rebuild_multimesh()
 
 	# 生成地形完毕后，将玩家放置在世界中心上方
 	# 使用广度优先搜索找到玩家脚底最近的方块位置
-	var player_spawn_pos: Vector3i = Vector3i(world_size.x / 2, world_size.y, world_size.z / 2)
+	var center_x: int = floori(float(world_size.x) * 0.5)
+	var center_z: int = floori(float(world_size.z) * 0.5)
+	var player_spawn_pos: Vector3i = Vector3i(center_x, world_size.y - 1, center_z)
 	var nearest_block: Vector3i = find_nearest_block(player_spawn_pos)
 	
 	# 将玩家放置在最近的方块上方

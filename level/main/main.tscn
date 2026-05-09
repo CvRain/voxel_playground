@@ -20,10 +20,22 @@ albedo_color = Color(2.4065375e-07, 0.63421273, 0.28113252, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_llmml"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gd1w1"]
+albedo_color = Color(0.044000063, 0.88, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_iuh81"]
+material = SubResource("StandardMaterial3D_gd1w1")
+
+[sub_resource type="MultiMesh" id="MultiMesh_sjq64"]
+transform_format = 1
+mesh = SubResource("BoxMesh_iuh81")
+
 [node name="Main" type="Node3D" unique_id=222031110]
 script = ExtResource("1_llmml")
-world_size = Vector3i(32, 32, 32)
-cut_off = 0.3999999999999999
+world_size = Vector3i(64, 64, 64)
+terrain_density = 0.35
+noise_frequency = 0.119
+noise_seed = 114514
 player_scene = ExtResource("1_4mqva")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=917657716]
@@ -40,3 +52,6 @@ material = SubResource("StandardMaterial3D_4mqva")
 [node name="WhiteCube" type="CSGBox3D" parent="." unique_id=512993438]
 use_collision = true
 material = SubResource("StandardMaterial3D_llmml")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1329243830]
+multimesh = SubResource("MultiMesh_sjq64")

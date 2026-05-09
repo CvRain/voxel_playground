@@ -8,6 +8,7 @@
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1354657605]
 script = ExtResource("1_tdf8b")
+flying = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=970006767]
 mesh = SubResource("CapsuleMesh_nnrqh")
