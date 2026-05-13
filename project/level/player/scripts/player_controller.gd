@@ -14,9 +14,36 @@ extends CharacterBody3D
 # 飞行模式状态
 @export var flying: bool = false
 
+# TerrainGenerator 引用（由 TerrainGenerator.cs 在 SpawnPlayer 后注入）
+var terrain_generator: Node = null
+
 func _ready() -> void:
-	# 锁定并隐藏鼠标
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	_create_crosshair()
+
+func _create_crosshair() -> void:
+	var canvas_layer := CanvasLayer.new()
+	add_child(canvas_layer)
+
+	# 横线
+	var h_bar := ColorRect.new()
+	h_bar.color = Color(1.0, 1.0, 1.0, 0.85)
+	h_bar.set_anchors_preset(Control.PRESET_CENTER)
+	h_bar.offset_left   = -10
+	h_bar.offset_right  =  10
+	h_bar.offset_top    =  -1
+	h_bar.offset_bottom =   1
+	canvas_layer.add_child(h_bar)
+
+	# 竖线
+	var v_bar := ColorRect.new()
+	v_bar.color = Color(1.0, 1.0, 1.0, 0.85)
+	v_bar.set_anchors_preset(Control.PRESET_CENTER)
+	v_bar.offset_left   =  -1
+	v_bar.offset_right  =   1
+	v_bar.offset_top    = -10
+	v_bar.offset_bottom =  10
+	canvas_layer.add_child(v_bar)
 
 func _physics_process(delta: float) -> void:
 	# 飞行模式切换
@@ -79,24 +106,27 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	# 鼠标移动 - 视角旋转
+	# 鼠标移动 - 视角旋转（仅捕获状态下响应）
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		var relative: Vector2 = event.relative * mouse_sensitivity
-		
-		# 水平旋转（整个身体）
 		rotate_y(-relative.x)
-		
-		# 垂直旋转（仅头部/眼睛）
 		eye_camera.rotation.x = clamp(eye_camera.rotation.x - relative.y, deg_to_rad(-89), deg_to_rad(89))
-	
-	# 点击 ESC 释放鼠标
+
+	# ESC 切换鼠标捕获
 	if event.is_action_pressed("ui_cancel"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	
-	# 点击鼠标重新捕获
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
+
+	# 鼠标左键：捕获 or 破坏方块
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		elif terrain_generator != null:
+			terrain_generator.BreakBlockAt(eye_camera)
+
+	# 鼠标右键：放置方块
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED and terrain_generator != null:
+			terrain_generator.PlaceBlockAt(eye_camera)

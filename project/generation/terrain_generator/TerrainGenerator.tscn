@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bylddrmy2poi1"]
+
+[ext_resource type="Script" uid="uid://bo0tvxi2axkx1" path="res://generation/terrain_generator/TerrainGenerator.cs" id="1_hrid2"]
+
+[node name="TerrainGenerator" type="Node3D" unique_id=104554355]
+script = ExtResource("1_hrid2")
+WorldSize = Vector3i(16, 64, 16)
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=127578058]
