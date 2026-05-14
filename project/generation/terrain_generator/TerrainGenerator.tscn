@@ -1,9 +1,13 @@
 [gd_scene format=3 uid="uid://bylddrmy2poi1"]
 
-[ext_resource type="Script" uid="uid://bo0tvxi2axkx1" path="res://generation/terrain_generator/TerrainGenerator.cs" id="1_hrid2"]
+[ext_resource type="Script" uid="uid://ura1vuqafnog" path="res://generation/terrain_generator/TerrainGenerator.cs" id="1_hrid2"]
+[ext_resource type="Script" uid="uid://cw7qw2h7m5xiq" path="res://generation/terrain_generator/MeshInstance.cs" id="2_hvtaf"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_hrid2"]
 
 [node name="TerrainGenerator" type="Node3D" unique_id=104554355]
 script = ExtResource("1_hrid2")
-ChunkSize = Vector3i(16, 256, 16)
 
-[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=127578058]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1423809408]
+mesh = SubResource("ArrayMesh_hrid2")
+script = ExtResource("2_hvtaf")

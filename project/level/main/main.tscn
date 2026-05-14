@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://d1on6o7q7nro4"]
 
-[ext_resource type="Script" uid="uid://b8ts3gosxvlna" path="res://level/main/scripts/test.gd" id="1_4mqva"]
 [ext_resource type="PackedScene" uid="uid://bylddrmy2poi1" path="res://generation/terrain_generator/TerrainGenerator.tscn" id="2_llmml"]
-[ext_resource type="PackedScene" uid="uid://c3a4l4emoffq6" path="res://level/player/player_controller.tscn" id="3_gd1w1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lscqb"]
 sky_top_color = Color(0.5019608, 0.8, 1, 1)
@@ -17,7 +15,6 @@ background_mode = 2
 sky = SubResource("Sky_4mqva")
 
 [node name="Main" type="Node3D" unique_id=222031110]
-script = ExtResource("1_4mqva")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=917657716]
 environment = SubResource("Environment_llmml")
@@ -26,6 +23,8 @@ environment = SubResource("Environment_llmml")
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 500, 0)
 shadow_enabled = true
 
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1555335417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+current = true
+
 [node name="TerrainGenerator" parent="." unique_id=104554355 instance=ExtResource("2_llmml")]
-ChunkSize = Vector3i(64, 64, 64)
-PlayerScene = ExtResource("3_gd1w1")
