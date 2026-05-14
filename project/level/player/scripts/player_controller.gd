@@ -29,6 +29,7 @@ func _create_crosshair() -> void:
 	var h_bar := ColorRect.new()
 	h_bar.color = Color(1.0, 1.0, 1.0, 0.85)
 	h_bar.set_anchors_preset(Control.PRESET_CENTER)
+	h_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h_bar.offset_left   = -10
 	h_bar.offset_right  =  10
 	h_bar.offset_top    =  -1
@@ -39,6 +40,7 @@ func _create_crosshair() -> void:
 	var v_bar := ColorRect.new()
 	v_bar.color = Color(1.0, 1.0, 1.0, 0.85)
 	v_bar.set_anchors_preset(Control.PRESET_CENTER)
+	v_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v_bar.offset_left   =  -1
 	v_bar.offset_right  =   1
 	v_bar.offset_top    = -10
@@ -102,10 +104,14 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0, current_speed)
 		velocity.z = move_toward(velocity.z, 0, current_speed)
 	
+	# 确保窗口重新获得焦点后仍会重新捕获鼠标
+	if DisplayServer.mouse_get_mode() != DisplayServer.MOUSE_MODE_CAPTURED and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
 	# 移动
 	move_and_slide()
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	# 鼠标移动 - 视角旋转（仅捕获状态下响应）
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		var relative: Vector2 = event.relative * mouse_sensitivity

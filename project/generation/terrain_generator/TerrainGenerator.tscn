@@ -4,6 +4,6 @@
 
 [node name="TerrainGenerator" type="Node3D" unique_id=104554355]
 script = ExtResource("1_hrid2")
-WorldSize = Vector3i(16, 64, 16)
+ChunkSize = Vector3i(16, 256, 16)
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=127578058]

@@ -27,5 +27,5 @@ transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545
 shadow_enabled = true
 
 [node name="TerrainGenerator" parent="." unique_id=104554355 instance=ExtResource("2_llmml")]
-WorldSize = Vector3i(32, 16, 32)
+ChunkSize = Vector3i(64, 64, 64)
 PlayerScene = ExtResource("3_gd1w1")
